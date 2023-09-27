@@ -9,18 +9,9 @@ import java.util.*;
 
 public class Crypto {
     private static final String INCORRECT_INPUT = "Некорректный ввод";
-    private static final String INCORRECT_PATH = "Фала по указанному пути не существует";
-    private static final String INPUT_PATH = "Введите путь к файлу";
-
-    private static final char[] ALPHABET = {'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м',
-            'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'А',
-            'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У',
-            'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', '.', ',', '«', '»', '"', '“', '”', '-',
-            '*', '/', '@', '#', '%', '№', '\\', '\'', '\n', '\t', ':', '!', '?', '1', '2', '3', '4', '5', '6',
-            '7', '8', '9', '0', ' '};
+    private static final char[] ALPHABET = {'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', '.', ',', '«', '»', '"', '“', '”', '-', '*', '/', '@', '#', '%', '№', '\\', '\'', '\n', '\t', ':', '!', '?', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ' '};
     private static final int ALPHABET_LENGTH = ALPHABET.length;
-    private static Path path;       // путь к исходномуфайлу
-    private static String filePathString;
+    private static Path path;       // путь к исходному файлу
 
     private static void encrypt(int key) {
         Path filePath = getPathCrypto("encrypted_");
@@ -64,12 +55,13 @@ public class Crypto {
         System.out.println("Ключ шифра " + (-finalKey));
     }
 
-//      метод определения названия зашифрованного/расшифрованного файла
+    //      метод определения названия зашифрованного/расшифрованного файла
     private static Path getPathCrypto(String cryptoDirection) {
         String fileName = path.getFileName().toString();
         return Path.of(path.getParent().toString(), cryptoDirection + fileName);
     }
-//      метод общих процедур для шифрования/расшифровывания текста и для получения массива символов обработанного текста
+
+    //      метод общих процедур для шифрования/расшифровывания текста и для получения массива символов обработанного текста
     private static String getText(int key, String cryptoDirection) {
         StringBuilder stringBuilder = new StringBuilder();
         String crypto = null;
@@ -88,8 +80,7 @@ public class Crypto {
                 }
             }
             crypto = new String(chars);
-            try (PrintWriter out = new PrintWriter(getPathCrypto(cryptoDirection).toString()
-                    , StandardCharsets.UTF_8)) {
+            try (PrintWriter out = new PrintWriter(getPathCrypto(cryptoDirection).toString(), StandardCharsets.UTF_8)) {
                 out.println(crypto);
             }
         } catch (IOException e) {
@@ -98,59 +89,37 @@ public class Crypto {
         return crypto;
     }
 
-//     Idea предложила вынести код в отдельный метод для исключения повторов. Проверка существования файла
-    private static void checkFileExist(Scanner scanner) {
-        scanner.nextLine();
-        while (true) {
-            System.out.println(INPUT_PATH);
-            filePathString = scanner.nextLine();
-            path = Path.of(filePathString);
-            if (Files.isRegularFile(path)) {
-                break;
-            }
-            System.out.println(INCORRECT_PATH);
-        }
-    }
-
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
             while (true) {
-                System.out.println("Введите 1 для шифрования/дешифрования если ключ шифрования/дешифрования известен\n"
-                        + "Введите 2 для дешифрования с помощью подбора ключа");
-                int markerKeyPresence = scanner.nextInt();
+                System.out.println("""
+                        Введите:
+                        1 для шифрования
+                        2 для дешифрования если ключ  известен
+                        3 для дешифрования с помощью подбора ключа""");
+                int keyProcedure = scanner.nextInt();
                 int encryptKey;
-                if (markerKeyPresence == 1) {
+                if ((keyProcedure == 1 || keyProcedure == 2)) {
                     while (true) {
-                        System.out.println("Введите ключ для шифрования/дешифрования - целое число от 1 до "
-                                + (ALPHABET_LENGTH - 1));
+                        System.out.println("Введите ключ - целое число от 1 до " + (ALPHABET_LENGTH - 1));
                         encryptKey = scanner.nextInt();
                         if ((encryptKey > 0) && (encryptKey <= ALPHABET_LENGTH)) {
                             break;
                         }
                         System.out.println(INCORRECT_INPUT);
                     }
-                    filePathString = "";
-                    checkFileExist(scanner);
-                    System.out.println("Введите 1 для шифрования\n" + "Введите 2 для дешифрования");
-                    int directionKey = scanner.nextInt();
 
-                    while (true) {
-                        if (directionKey == 1) {
-                            encrypt(encryptKey);
-                            break;
-                        } else if (directionKey == 2) {
-                            decrypt(encryptKey);
-                            break;
-                        }
-                        System.out.println(INCORRECT_INPUT);
+                    path = FileService.checkFileExist(scanner);
+                    if (keyProcedure == 1) {
+                        encrypt(encryptKey);
+                    } else {
+                        decrypt(encryptKey);
                     }
                     break;
-                } else if (markerKeyPresence == 2) {
-                    filePathString = "";
-                    checkFileExist(scanner);
-                    path = Path.of(filePathString);
+                } else if (keyProcedure == 3) {
+                    path = FileService.checkFileExist(scanner);
                     decryptBruteForce();
                     break;
                 }
