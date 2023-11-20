@@ -21,6 +21,4 @@ public class FileService {//     Idea предложила вынести код
         }
         return Path.of(filePathString);
     }
-
-
 }
